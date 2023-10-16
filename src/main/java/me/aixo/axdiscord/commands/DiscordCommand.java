@@ -11,10 +11,11 @@ import org.bukkit.entity.Player;
 import java.util.UUID;
 
 public class DiscordCommand implements CommandExecutor {
-    String alreadySyncedMsg = AXDiscord.getInstance().getConfig().getString("messages.minecraft.already-synced");
-    String codeGeneratedMsg = AXDiscord.getInstance().getConfig().getString("messages.minecraft.code-generated");
-    String noPermissionsMsg = AXDiscord.getInstance().getConfig().getString("messages.minecraft.no-permission");
-    String incorrectUsage = AXDiscord.getInstance().getConfig().getString("messages.minecraft.incorrect-usage");
+    String alreadySyncedMsg = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.already-synced"));
+    String codeGeneratedMsg = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.code-generated"));
+    String noPermissionsMsg = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.no-permission"));
+    String incorrectUsage = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.incorrect-usage"));
+
 
 
     @Override

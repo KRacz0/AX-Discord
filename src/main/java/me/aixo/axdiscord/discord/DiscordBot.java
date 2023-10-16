@@ -25,7 +25,7 @@ import static me.aixo.axdiscord.database.DatabaseManager.savePlayerInfo;
         String codeAcceptedMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-accepted");
         String codeInvalidMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-invalid");
         String codeInvalidOfflineMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-acceptedOffline");
-        String successfulSyncBroadcastMsg = AXDiscord.getInstance().getConfig().getString("messages.discord.successful-sync-broadcast");
+        String successfulSyncBroadcastMsg = ChatColor.translateAlternateColorCodes('&',AXDiscord.getInstance().getConfig().getString("messages.discord.successful-sync-broadcast"));
         //String successfulSyncBroadcastMsg = ConfigManager.getInstance().getSuccessfulSyncBroadcastMsg();
 
         private RoleSynchronizer roleSynchronizer = new RoleSynchronizer();
