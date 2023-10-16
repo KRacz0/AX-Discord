@@ -1,0 +1,32 @@
+database:
+  host: "localhost"
+  port: "3306"
+  name: "minecraft"
+  username: "username"
+  password: "password"
+
+bot_token: "TWÓJ_TOKEN"
+channel_id: "ID_KANAŁU"
+guild_id: "ID_SERWERA"
+
+verified_role_id: "000000000000000000"
+
+GroupRoleSynchronization:
+  svip: "000000000000000000"
+  vip: "000000000000000000"
+
+messages:
+  minecraft:
+    already-synced: '&cTwoje konto jest już zsynchronizowane!'
+    code-generated: '&aTwój kod to: &e%code%'
+    no-permission: '&cNie masz uprawnień do tej komendy!'
+    incorrect-usage: '&cNieprawidłowe użycie komendy! Użyj /discord lub /discord reload.'
+    successful-sync-broadcast: "&aGracz %player% pomyślnie zsynchronizował swoje konto Discord!"
+  discord:
+    code-accepted: "**Gratulacje!** Otrzymałeś swoją nagrodę"
+    code-acceptedOffline: "Kod został zaakceptowany, ale nie jesteś online na serwerze!"
+    code-invalid: "Nieprawidłowy kod!"
+
+commands_for_link:
+  - "give %player% diamond 1"
+  - "broadcast %player% użył kodu z Discorda!"

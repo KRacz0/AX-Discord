@@ -1,0 +1,11 @@
+name: AX-Discord
+version: '${project.version}'
+main: me.aixo.axdiscord.AXDiscord
+api-version: '1.19'
+author: aix0
+description: Plugin synchronizujący konta Minecraft z Discord
+
+commands:
+  discord:
+    description: Zarządzanie integracją Discorda.
+    usage: /<command> [reload]

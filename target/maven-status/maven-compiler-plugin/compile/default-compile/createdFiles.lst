@@ -1,0 +1,9 @@
+me\aixo\axdiscord\AXDiscord.class
+me\aixo\axdiscord\discord\CodeManager.class
+me\aixo\axdiscord\discord\NicknameManager.class
+me\aixo\axdiscord\discord\RoleSynchronizer.class
+me\aixo\axdiscord\listeners\LuckPermsListener.class
+me\aixo\axdiscord\database\DatabaseManager.class
+me\aixo\axdiscord\discord\DiscordBot.class
+me\aixo\axdiscord\placeholder\AXDiscordPlaceholderExpansion.class
+me\aixo\axdiscord\commands\DiscordCommand.class
