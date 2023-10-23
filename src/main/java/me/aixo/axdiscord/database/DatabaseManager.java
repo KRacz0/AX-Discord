@@ -41,10 +41,10 @@ public class DatabaseManager {
         }
     }
 
-    public static boolean isPlayerSynced(UUID minecraftUUID) {
+    public static boolean isDiscordUserSynced(String discordId) {
         try (Connection connection = DatabaseManager.getConnection()) {
-            PreparedStatement checkStatement = connection.prepareStatement("SELECT COUNT(*) FROM discord_sync WHERE uuid = ?");
-            checkStatement.setString(1, minecraftUUID.toString());
+            PreparedStatement checkStatement = connection.prepareStatement("SELECT COUNT(*) FROM discord_sync WHERE discord_id = ?");
+            checkStatement.setString(1, discordId);
             ResultSet resultSet = checkStatement.executeQuery();
             resultSet.next();
             int count = resultSet.getInt(1);

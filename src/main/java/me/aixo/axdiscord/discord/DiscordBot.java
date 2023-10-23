@@ -18,15 +18,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import static me.aixo.axdiscord.database.DatabaseManager.isDiscordUserSynced;
 import static me.aixo.axdiscord.database.DatabaseManager.savePlayerInfo;
 
     public class DiscordBot extends ListenerAdapter {
         String codeAcceptedMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-accepted");
         String codeInvalidMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-invalid");
         String codeInvalidOfflineMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-acceptedOffline");
-        String successfulSyncBroadcastMsg = ChatColor.translateAlternateColorCodes('&',AXDiscord.getInstance().getConfig().getString("messages.discord.successful-sync-broadcast"));
-        //String successfulSyncBroadcastMsg = ConfigManager.getInstance().getSuccessfulSyncBroadcastMsg();
+        String successfulSyncBroadcastMsg = ChatColor.translateAlternateColorCodes('&',AXDiscord.getInstance().getConfig().getString("messages.minecraft.successful-sync-broadcast"));
 
         private RoleSynchronizer roleSynchronizer = new RoleSynchronizer();
 
@@ -44,6 +45,10 @@ import static me.aixo.axdiscord.database.DatabaseManager.savePlayerInfo;
 
         @Override
         public void onMessageReceived(MessageReceivedEvent event) {
+
+            // Oznaczanie użytkownika w wiadomości
+            String mention = event.getAuthor().getAsMention();
+
             // Ignoruj wiadomości od bota
             if (event.getAuthor().isBot()) return;
 
@@ -60,6 +65,15 @@ import static me.aixo.axdiscord.database.DatabaseManager.savePlayerInfo;
 
                 final UUID finalPlayerUUID = playerUUID;
                 String discordId = event.getAuthor().getId();
+
+                if (isDiscordUserSynced(discordId)) {
+                    event.getChannel().sendMessage(mention + " Twoje konto Discord jest już zsynchronizowane z kontem Minecraft!")
+                            .queue(msg -> {
+                                msg.delete().queueAfter(5, TimeUnit.SECONDS);
+                                event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
+                            });
+                    return;
+                }
 
                 // Wykorzystaj scheduler do przeniesienia operacji na główny wątek serwera
                 Bukkit.getScheduler().runTask(AXDiscord.getInstance(), () -> {
@@ -95,14 +109,26 @@ import static me.aixo.axdiscord.database.DatabaseManager.savePlayerInfo;
                                 guild.addRoleToMember(member, role).queue();
                             }
                         }
-                        event.getChannel().sendMessage(codeAcceptedMsgDiscord).queue();
+                        event.getChannel().sendMessage(mention + " " + codeAcceptedMsgDiscord)
+                                .queue(msg -> {
+                                    msg.delete().queueAfter(5, TimeUnit.SECONDS);
+                                    event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
+                                });
                     } else {
-                        event.getChannel().sendMessage(codeInvalidOfflineMsgDiscord).queue();
+                        event.getChannel().sendMessage(mention + " " + codeInvalidMsgDiscord)
+                                .queue(msg -> {
+                                    msg.delete().queueAfter(5, TimeUnit.SECONDS);
+                                    event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
+                                });
                     }
                     CodeManager.getPlayerCodes().remove(message);
                 });
             } else {
-                event.getChannel().sendMessage(codeInvalidMsgDiscord).queue();
+                event.getChannel().sendMessage(mention + " " + codeInvalidOfflineMsgDiscord)
+                        .queue(msg -> {
+                            msg.delete().queueAfter(5, TimeUnit.SECONDS);
+                            event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
+                        });
             }
         }
     }

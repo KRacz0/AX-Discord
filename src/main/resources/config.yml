@@ -18,7 +18,7 @@ GroupRoleSynchronization:
 messages:
   minecraft:
     already-synced: '&cTwoje konto jest już zsynchronizowane!'
-    code-generated: '&aTwój kod to: &e%code%'
+    code-generated: '&aTwój kod to: &e%code% &aDolacz do naszego serwera &5discord.gg/LizardMC &ai uzyj swojego kodu na kanale 「」ꜱᴋʏʙʟᴏᴄᴋ'
     no-permission: '&cNie masz uprawnień do tej komendy!'
     incorrect-usage: '&cNieprawidłowe użycie komendy! Użyj /discord lub /discord reload.'
     successful-sync-broadcast: "&aGracz %player% pomyślnie zsynchronizował swoje konto Discord!"
@@ -29,4 +29,3 @@ messages:
 
 commands_for_link:
   - "give %player% diamond 1"
-  - "broadcast %player% użył kodu z Discorda!"

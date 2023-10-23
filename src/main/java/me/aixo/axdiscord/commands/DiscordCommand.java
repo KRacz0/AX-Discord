@@ -7,6 +7,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.UUID;
 
@@ -14,7 +16,6 @@ public class DiscordCommand implements CommandExecutor {
     String alreadySyncedMsg = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.already-synced"));
     String codeGeneratedMsg = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.code-generated"));
     String noPermissionsMsg = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.no-permission"));
-    String incorrectUsage = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.incorrect-usage"));
 
 
 
@@ -38,7 +39,10 @@ public class DiscordCommand implements CommandExecutor {
                 // Użyj nowej metody generateCode() z klasy CodeManager
                 String code = CodeManager.generateCode(playerUUID);
                 if (code != null) {
-                    player.sendMessage(codeGeneratedMsg.replace("%code%", code));
+                    String formattedMessage = codeGeneratedMsg.replace("%code%", code);
+                    TextComponent messageComponent = new TextComponent(formattedMessage);
+                    messageComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.gg/lizardmc"));
+                    player.spigot().sendMessage(messageComponent);
                 } else {
                     player.sendMessage("Nie można wygenerować kodu. Spróbuj ponownie później.");
                 }
@@ -48,7 +52,7 @@ public class DiscordCommand implements CommandExecutor {
                     return true;
                 }
                 AXDiscord.getInstance().reloadConfig();
-                sender.sendMessage("&2AXDiscord została zrelodowany!");
+                sender.sendMessage("AXDiscord została zrelodowany!");
             }
         }
         return true;
