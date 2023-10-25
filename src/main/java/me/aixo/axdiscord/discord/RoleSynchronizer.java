@@ -1,6 +1,7 @@
 package me.aixo.axdiscord.discord;
 
 import me.aixo.axdiscord.AXDiscord;
+import me.aixo.axdiscord.database.DatabaseManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.luckperms.api.LuckPerms;
@@ -24,14 +25,30 @@ public class RoleSynchronizer {
     public void synchronizeRolesWithDiscord(Member member, UUID playerUUID) {
         // Pobierz mapę rang z konfiguracji
         Map<String, Object> configMap = AXDiscord.getInstance().getConfig().getConfigurationSection("GroupRoleSynchronization").getValues(false);
+
+        // Sprawdzenie, czy mapa konfiguracji jest pusta
+        if (configMap == null || configMap.isEmpty()) {
+            AXDiscord.getInstance().getLogger().severe("Nie udało się wczytać mapy rang z konfiguracji.");
+            return;
+        }
+
         Map<String, String> groupRoleSyncMap = new HashMap<>();
         for (Map.Entry<String, Object> entry : configMap.entrySet()) {
             groupRoleSyncMap.put(entry.getKey(), entry.getValue().toString());
-            if (configMap == null || configMap.isEmpty()) {
-                AXDiscord.getInstance().getLogger().severe("Nie udało się wczytać mapy rang z konfiguracji.");
-                return;
-            }
         }
+
+        // Sprawdzenie, czy użytkownik jest zsynchronizowany
+        if (!DatabaseManager.isPlayerInDatabase(playerUUID)) {
+            return;
+        }
+
+        // Sprawdzenie, czy ID Discorda istnieje
+        String discordId = DatabaseManager.getDiscordIdByUUID(playerUUID);
+        if (discordId == null || discordId.isEmpty()) {
+            return;
+        }
+
+
 
         // Pobierz obiekt użytkownika z LuckPerms
         net.luckperms.api.model.user.User user = luckPerms.getUserManager().getUser(playerUUID);
@@ -71,6 +88,17 @@ public class RoleSynchronizer {
         Map<String, String> groupRoleSyncMap = new HashMap<>();
         for (Map.Entry<String, Object> entry : configMap.entrySet()) {
             groupRoleSyncMap.put(entry.getKey(), entry.getValue().toString());
+        }
+
+        // Sprawdzenie, czy użytkownik jest zsynchronizowany
+        if (!DatabaseManager.isPlayerInDatabase(playerUUID)) {
+            return;
+        }
+
+        // Sprawdzenie, czy ID Discorda istnieje
+        String discordId = DatabaseManager.getDiscordIdByUUID(playerUUID);
+        if (discordId == null || discordId.isEmpty()) {
+            return;
         }
 
         net.luckperms.api.model.user.User user = luckPerms.getUserManager().getUser(playerUUID);

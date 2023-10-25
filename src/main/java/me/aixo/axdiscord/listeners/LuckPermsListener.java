@@ -38,8 +38,23 @@ public class LuckPermsListener implements Listener {
             UUID uuid = UUID.fromString(user.getUniqueId().toString());
 
             String discordId = getDiscordIdByUUID(uuid);
+            if (discordId == null || discordId.isEmpty()) {
+                // ID użytkownika Discord nie istnieje lub jest puste, więc zakończ metodę
+                return;
+            }
+
             Guild guild = AXDiscord.getJDA().getGuildById(AXDiscord.getGuildId());
+            if (guild == null) {
+                // Gildia nie istnieje, więc zakończ metodę
+                return;
+            }
+
             Member member = guild.retrieveMemberById(discordId).complete();
+            if (member == null) {
+                // Członek gildii nie istnieje, więc zakończ metodę
+                return;
+            }
+
             roleSynchronizer.synchronizeRolesWithDiscord(member, uuid);
         }
     }
@@ -50,11 +65,24 @@ public class LuckPermsListener implements Listener {
             UUID uuid = UUID.fromString(user.getUniqueId().toString());
 
             String discordId = getDiscordIdByUUID(uuid);
+            if (discordId == null || discordId.isEmpty()) {
+                // ID użytkownika Discord nie istnieje lub jest puste, więc zakończ metodę
+                return;
+            }
+
             Guild guild = AXDiscord.getJDA().getGuildById(AXDiscord.getGuildId());
+            if (guild == null) {
+                // Gildia nie istnieje, więc zakończ metodę
+                return;
+            }
+
             Member member = guild.retrieveMemberById(discordId).complete();
+            if (member == null) {
+                // Członek gildii nie istnieje, więc zakończ metodę
+                return;
+            }
 
             roleSynchronizer.removeRolesFromDiscord(member, uuid);
         }
     }
-
 }

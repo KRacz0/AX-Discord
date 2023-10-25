@@ -23,51 +23,63 @@ import java.util.concurrent.TimeUnit;
 import static me.aixo.axdiscord.database.DatabaseManager.isDiscordUserSynced;
 import static me.aixo.axdiscord.database.DatabaseManager.savePlayerInfo;
 
-    public class DiscordBot extends ListenerAdapter {
-        String codeAcceptedMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-accepted");
-        String codeInvalidMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-invalid");
-        String codeInvalidOfflineMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-acceptedOffline");
-        String successfulSyncBroadcastMsg = ChatColor.translateAlternateColorCodes('&',AXDiscord.getInstance().getConfig().getString("messages.minecraft.successful-sync-broadcast"));
+public class DiscordBot extends ListenerAdapter {
+    String codeAcceptedMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-accepted");
+    String codeInvalidMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-invalid");
+    String codeInvalidOfflineMsgDiscord = AXDiscord.getInstance().getConfig().getString("messages.discord.code-acceptedOffline");
+    String successfulSyncBroadcastMsg = ChatColor.translateAlternateColorCodes('&', AXDiscord.getInstance().getConfig().getString("messages.minecraft.successful-sync-broadcast"));
 
-        private RoleSynchronizer roleSynchronizer = new RoleSynchronizer();
+    private RoleSynchronizer roleSynchronizer = new RoleSynchronizer();
 
-        public static JDA startBot() {
-            try {
-                JDABuilder builder = JDABuilder.createDefault(AXDiscord.getBotToken())
-                        .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT);
-                builder.addEventListeners(new DiscordBot());
-                return builder.build();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
+    public static JDA startBot() {
+        try {
+            JDABuilder builder = JDABuilder.createDefault(AXDiscord.getBotToken())
+                    .enableIntents(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT);
+            builder.addEventListeners(new DiscordBot());
+            return builder.build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
+    }
 
-        @Override
-        public void onMessageReceived(MessageReceivedEvent event) {
+    @Override
+    public void onMessageReceived(MessageReceivedEvent event) {
+        // Oznaczanie użytkownika w wiadomości
+        String mention = event.getAuthor().getAsMention();
 
-            // Oznaczanie użytkownika w wiadomości
-            String mention = event.getAuthor().getAsMention();
+        // Ignoruj wiadomości od bota
+        if (event.getAuthor().isBot()) return;
 
-            // Ignoruj wiadomości od bota
-            if (event.getAuthor().isBot()) return;
+        if (!event.getChannel().getId().equals(AXDiscord.getChannelId())) return;
+        String message = event.getMessage().getContentRaw();
 
-            if (!event.getChannel().getId().equals(AXDiscord.getChannelId())) return;
-            String message = event.getMessage().getContentRaw();
-            if (CodeManager.getPlayerCodes().containsValue(message)) {
-                UUID playerUUID = null;
-                for (Map.Entry<UUID, String> entry : CodeManager.getPlayerCodes().entrySet()) {
-                    if (entry.getValue().equals(message)) {
-                        playerUUID = entry.getKey();
-                        break;
-                    }
+        if (CodeManager.getPlayerCodes().containsValue(message)) {
+            UUID playerUUID = null;
+            for (Map.Entry<UUID, String> entry : CodeManager.getPlayerCodes().entrySet()) {
+                if (entry.getValue().equals(message)) {
+                    playerUUID = entry.getKey();
+                    break;
                 }
+            }
 
-                final UUID finalPlayerUUID = playerUUID;
-                String discordId = event.getAuthor().getId();
+            final UUID finalPlayerUUID = playerUUID;
+            String discordId = event.getAuthor().getId();
 
-                if (isDiscordUserSynced(discordId)) {
-                    event.getChannel().sendMessage(mention + " Twoje konto Discord jest już zsynchronizowane z kontem Minecraft!")
+            if (isDiscordUserSynced(discordId)) {
+                event.getChannel().sendMessage(mention + " Twoje konto Discord jest już zsynchronizowane z kontem Minecraft!")
+                        .queue(msg -> {
+                            msg.delete().queueAfter(5, TimeUnit.SECONDS);
+                            event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
+                        });
+                return;
+            }
+
+            // Wykorzystaj scheduler do przeniesienia operacji na główny wątek serwera
+            Bukkit.getScheduler().runTask(AXDiscord.getInstance(), () -> {
+                Player player = Bukkit.getServer().getPlayer(finalPlayerUUID);
+                if (player == null || !player.isOnline()) {
+                    event.getChannel().sendMessage(mention + " " + codeInvalidOfflineMsgDiscord)
                             .queue(msg -> {
                                 msg.delete().queueAfter(5, TimeUnit.SECONDS);
                                 event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
@@ -75,60 +87,50 @@ import static me.aixo.axdiscord.database.DatabaseManager.savePlayerInfo;
                     return;
                 }
 
-                // Wykorzystaj scheduler do przeniesienia operacji na główny wątek serwera
-                Bukkit.getScheduler().runTask(AXDiscord.getInstance(), () -> {
-                    Player player = Bukkit.getServer().getPlayer(finalPlayerUUID);
-                    savePlayerInfo(finalPlayerUUID, player.getName(), discordId);
-                    if (player != null && player.isOnline()) {
-                        List<String> commands = AXDiscord.getInstance().getConfig().getStringList("commands_for_link");
-                        for (String cmd : commands) {
-                            cmd = cmd.replace("%player%", player.getName());
-                            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
-                            Bukkit.broadcastMessage(successfulSyncBroadcastMsg.replace("%player%", player.getName()));
+                savePlayerInfo(finalPlayerUUID, player.getName(), discordId);
+                List<String> commands = AXDiscord.getInstance().getConfig().getStringList("commands_for_link");
+                for (String cmd : commands) {
+                    cmd = cmd.replace("%player%", player.getName());
+                    Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
+                    Bukkit.broadcastMessage(successfulSyncBroadcastMsg.replace("%player%", player.getName()));
 
-                            // Zmień pseudonim użytkownika na serwerze Discord
-                            NicknameManager.setNickname(event, player);
+                    // Zmień pseudonim użytkownika na serwerze Discord
+                    NicknameManager.setNickname(event, player);
 
-                            // Dodaj rolę użytkownikowi
-                            Guild guild = event.getGuild();
-                            Role role = guild.getRoleById("933473756553306162");
-                            if (role == null) {
-                                return;
-                            }
-
-                            Member member = guild.retrieveMember(event.getAuthor()).complete();
-
-                            if (member == null) {
-                                return;
-                            }
-
-                            // Synchronizuj role z Discordem
-                            roleSynchronizer.synchronizeRolesWithDiscord(member, finalPlayerUUID);
-
-                            if (!member.getRoles().contains(role)) {
-                                guild.addRoleToMember(member, role).queue();
-                            }
-                        }
-                        event.getChannel().sendMessage(mention + " " + codeAcceptedMsgDiscord)
-                                .queue(msg -> {
-                                    msg.delete().queueAfter(5, TimeUnit.SECONDS);
-                                    event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
-                                });
-                    } else {
-                        event.getChannel().sendMessage(mention + " " + codeInvalidMsgDiscord)
-                                .queue(msg -> {
-                                    msg.delete().queueAfter(5, TimeUnit.SECONDS);
-                                    event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
-                                });
+                    // Dodaj rolę użytkownikowi
+                    Guild guild = event.getGuild();
+                    Role role = guild.getRoleById("933473756553306162");
+                    if (role == null) {
+                        return;
                     }
-                    CodeManager.getPlayerCodes().remove(message);
-                });
-            } else {
-                event.getChannel().sendMessage(mention + " " + codeInvalidOfflineMsgDiscord)
+
+                    Member member = guild.retrieveMember(event.getAuthor()).complete();
+
+                    if (member == null) {
+                        return;
+                    }
+
+                    // Synchronizuj role z Discordem
+                    roleSynchronizer.synchronizeRolesWithDiscord(member, finalPlayerUUID);
+
+                    if (!member.getRoles().contains(role)) {
+                        guild.addRoleToMember(member, role).queue();
+                    }
+                }
+                event.getChannel().sendMessage(mention + " " + codeAcceptedMsgDiscord)
                         .queue(msg -> {
                             msg.delete().queueAfter(5, TimeUnit.SECONDS);
                             event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
                         });
-            }
+                CodeManager.getPlayerCodes().remove(message);
+            });
+        } else {
+            // Jeśli kod nie jest prawidłowy
+            event.getChannel().sendMessage(mention + " " + codeInvalidMsgDiscord)
+                    .queue(msg -> {
+                        msg.delete().queueAfter(5, TimeUnit.SECONDS);
+                        event.getMessage().delete().queueAfter(5, TimeUnit.SECONDS);
+                    });
         }
     }
+}
