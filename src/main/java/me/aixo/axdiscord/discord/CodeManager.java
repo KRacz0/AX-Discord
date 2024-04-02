@@ -15,12 +15,12 @@ public class CodeManager {
 
 
     public static String generateCode(UUID playerUUID) {
-        // Jeśli dla gracza istnieje kod, zwróć go
+        // Sprawdzanie czy gracz posiada swój kod
         if (playerCodes.containsKey(playerUUID)) {
             return playerCodes.get(playerUUID);
         }
 
-        // W przeciwnym razie wygeneruj nowy kod
+        // Generowanie kodu jeśli gracz nie posiada kodu
         String newCode = String.format("%04d", new Random().nextInt(10000));
         long currentTime = System.currentTimeMillis();
         playerCodes.put(playerUUID, newCode);

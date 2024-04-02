@@ -23,10 +23,10 @@ public class RoleSynchronizer {
     }
 
     public void synchronizeRolesWithDiscord(Member member, UUID playerUUID) {
-        // Pobierz mapę rang z konfiguracji
+        // Pobieranie mapy rang z konfiguracji
         Map<String, Object> configMap = AXDiscord.getInstance().getConfig().getConfigurationSection("GroupRoleSynchronization").getValues(false);
 
-        // Sprawdzenie, czy mapa konfiguracji jest pusta
+        // Sprawdzenie czy mapa konfiguracji jest pusta
         if (configMap == null || configMap.isEmpty()) {
             AXDiscord.getInstance().getLogger().severe("Nie udało się wczytać mapy rang z konfiguracji.");
             return;
@@ -37,12 +37,12 @@ public class RoleSynchronizer {
             groupRoleSyncMap.put(entry.getKey(), entry.getValue().toString());
         }
 
-        // Sprawdzenie, czy użytkownik jest zsynchronizowany
+        // Sprawdzenie czy użytkownik jest zsynchronizowany
         if (!DatabaseManager.isPlayerInDatabase(playerUUID)) {
             return;
         }
 
-        // Sprawdzenie, czy ID Discorda istnieje
+        // Sprawdzenie czy ID Discorda istnieje
         String discordId = DatabaseManager.getDiscordIdByUUID(playerUUID);
         if (discordId == null || discordId.isEmpty()) {
             return;
@@ -50,18 +50,18 @@ public class RoleSynchronizer {
 
 
 
-        // Pobierz obiekt użytkownika z LuckPerms
+        // Pobieranie obiektu użytkownika z LuckPerms
         net.luckperms.api.model.user.User user = luckPerms.getUserManager().getUser(playerUUID);
         if (user == null) {
             AXDiscord.getInstance().getLogger().severe("Nie można znaleźć użytkownika w LuckPerms.");
             return;
         }
 
-        // Dla każdej rangi gracza w LuckPerms
+
         for (InheritanceNode groupNode : user.getNodes(NodeType.INHERITANCE)) {
             String groupName = groupNode.getGroupName();
 
-            // Jeśli ranga istnieje w konfiguracji
+            // Jeśli ranga istnieje w configu
             if (groupRoleSyncMap.containsKey(groupName)) {
                 String roleId = groupRoleSyncMap.get(groupName);
                 if (roleId == null || roleId.isEmpty()) {
@@ -79,7 +79,7 @@ public class RoleSynchronizer {
                 }
             }
         }
-        // Usuń kod weryfikacyjny po pomyślnej synchronizacji ról
+        // Usuwanie kodu weryfikacyjnego po pomyślnej synchronizacji ról
         CodeManager.removeCodeForPlayer(playerUUID);
     }
 
@@ -90,12 +90,12 @@ public class RoleSynchronizer {
             groupRoleSyncMap.put(entry.getKey(), entry.getValue().toString());
         }
 
-        // Sprawdzenie, czy użytkownik jest zsynchronizowany
+        // Sprawdzenie czy użytkownik jest zsynchronizowany
         if (!DatabaseManager.isPlayerInDatabase(playerUUID)) {
             return;
         }
 
-        // Sprawdzenie, czy ID Discorda istnieje
+        // Sprawdzenie czy ID Discorda istnieje
         String discordId = DatabaseManager.getDiscordIdByUUID(playerUUID);
         if (discordId == null || discordId.isEmpty()) {
             return;

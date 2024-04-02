@@ -30,13 +30,12 @@ public class DiscordCommand implements CommandExecutor {
                 Player player = (Player) sender;
                 UUID playerUUID = player.getUniqueId();
 
-                // Sprawdzanie, czy gracz jest w bazie danych
+                // sprawdzanie, czy gracz jest w bazie danych
                 if (DatabaseManager.isPlayerInDatabase(playerUUID)) {
-                    player.sendMessage(alreadySyncedMsg); //Twoje konto jest już zsynchronizowane
+                    player.sendMessage(alreadySyncedMsg); //konto jest już zsynchronizowane
                     return true;
                 }
 
-                // Użyj nowej metody generateCode() z klasy CodeManager
                 String code = CodeManager.generateCode(playerUUID);
                 if (code != null) {
                     String formattedMessage = codeGeneratedMsg.replace("%code%", code);

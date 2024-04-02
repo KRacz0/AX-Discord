@@ -23,10 +23,10 @@ public class LuckPermsListener implements Listener {
     public LuckPermsListener(RoleSynchronizer roleSynchronizer) {
         this.roleSynchronizer = roleSynchronizer;
 
-        // Pobierz instancję LuckPerms
+        // Pobieranie LuckPerms
         LuckPerms luckPerms = LuckPermsProvider.get();
 
-        // Zarejestruj nasłuchiwacz w EventBus LuckPerms
+        // Nasłuchiwanie LuckPerms
         EventBus eventBus = luckPerms.getEventBus();
         eventBus.subscribe(NodeAddEvent.class, this::onNodeAdd);
         eventBus.subscribe(NodeRemoveEvent.class, this::onNodeRemove);
@@ -38,20 +38,20 @@ public class LuckPermsListener implements Listener {
             UUID uuid = UUID.fromString(user.getUniqueId().toString());
 
             String discordId = getDiscordIdByUUID(uuid);
+            // Sprawdzanie czy ID użytkownika Discord nie istnieje lub jest puste
             if (discordId == null || discordId.isEmpty()) {
-                // ID użytkownika Discord nie istnieje lub jest puste, więc zakończ metodę
                 return;
             }
 
             Guild guild = AXDiscord.getJDA().getGuildById(AXDiscord.getGuildId());
+            // sprawdzanie czy serwer istnieje
             if (guild == null) {
-                // Gildia nie istnieje, więc zakończ metodę
                 return;
             }
 
             Member member = guild.retrieveMemberById(discordId).complete();
+            // sprawdzanie czy uzytkownik nalezy do serwera
             if (member == null) {
-                // Członek gildii nie istnieje, więc zakończ metodę
                 return;
             }
 
@@ -65,20 +65,20 @@ public class LuckPermsListener implements Listener {
             UUID uuid = UUID.fromString(user.getUniqueId().toString());
 
             String discordId = getDiscordIdByUUID(uuid);
+            // sprawdzanie czy id uzytkownika discord istnieje
             if (discordId == null || discordId.isEmpty()) {
-                // ID użytkownika Discord nie istnieje lub jest puste, więc zakończ metodę
                 return;
             }
 
             Guild guild = AXDiscord.getJDA().getGuildById(AXDiscord.getGuildId());
+            // sprawdzanie czy gildia istnieje
             if (guild == null) {
-                // Gildia nie istnieje, więc zakończ metodę
                 return;
             }
 
             Member member = guild.retrieveMemberById(discordId).complete();
+            // sprawdzanie czy uzytkownik nalezy do serwera
             if (member == null) {
-                // Członek gildii nie istnieje, więc zakończ metodę
                 return;
             }
 

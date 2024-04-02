@@ -12,9 +12,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import sun.security.krb5.Config;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -48,7 +46,7 @@ public class DiscordBot extends ListenerAdapter {
         // Oznaczanie użytkownika w wiadomości
         String mention = event.getAuthor().getAsMention();
 
-        // Ignoruj wiadomości od bota
+        // Ignorowanie wiadomosci od bota
         if (event.getAuthor().isBot()) return;
 
         if (!event.getChannel().getId().equals(AXDiscord.getChannelId())) return;
@@ -75,7 +73,7 @@ public class DiscordBot extends ListenerAdapter {
                 return;
             }
 
-            // Wykorzystaj scheduler do przeniesienia operacji na główny wątek serwera
+            // scheduler do przeniesienia operacji na główny wątek
             Bukkit.getScheduler().runTask(AXDiscord.getInstance(), () -> {
                 Player player = Bukkit.getServer().getPlayer(finalPlayerUUID);
                 if (player == null || !player.isOnline()) {
@@ -94,10 +92,10 @@ public class DiscordBot extends ListenerAdapter {
                     Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
                     Bukkit.broadcastMessage(successfulSyncBroadcastMsg.replace("%player%", player.getName()));
 
-                    // Zmień pseudonim użytkownika na serwerze Discord
+                    // zmiana nicku discord na nick mc
                     NicknameManager.setNickname(event, player);
 
-                    // Dodaj rolę użytkownikowi
+                    // Nadawanie roli użytkownikowi "Gracz serwera"
                     Guild guild = event.getGuild();
                     Role role = guild.getRoleById("933473756553306162");
                     if (role == null) {
@@ -110,7 +108,7 @@ public class DiscordBot extends ListenerAdapter {
                         return;
                     }
 
-                    // Synchronizuj role z Discordem
+                    // Synchronizowanie roli mc z Discordem
                     roleSynchronizer.synchronizeRolesWithDiscord(member, finalPlayerUUID);
 
                     if (!member.getRoles().contains(role)) {
@@ -125,7 +123,6 @@ public class DiscordBot extends ListenerAdapter {
                 CodeManager.getPlayerCodes().remove(message);
             });
         } else {
-            // Jeśli kod nie jest prawidłowy
             event.getChannel().sendMessage(mention + " " + codeInvalidMsgDiscord)
                     .queue(msg -> {
                         msg.delete().queueAfter(5, TimeUnit.SECONDS);
