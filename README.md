@@ -70,7 +70,7 @@ commands_for_link:
 ```
 ## Configuration Description
 `database`: Configuration for MySQL database connections.<br/>
-`bot_token`, channel_id, guild_id: Required for setting up the Discord bot communication.<br/>
+`bot_token`, `channel_id`, `guild_id`: Required for setting up the Discord bot communication.<br/>
 `verified_role_id`: The ID of the role assigned on Discord after successful account synchronization.<br/>
 `GroupRoleSynchronization`: Mapping of Minecraft server ranks to Discord roles.<br/>
 `messages`: Customizable messages for various plugin interactions.<br/>
