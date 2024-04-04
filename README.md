@@ -69,12 +69,12 @@ commands_for_link:
   - "give %player% diamond 1"
 ```
 ## Configuration Description
-`database`: Configuration for MySQL database connections.
-`bot_token`, channel_id, guild_id: Required for setting up the Discord bot communication.
-`verified_role_id`: The ID of the role assigned on Discord after successful account synchronization.
-`GroupRoleSynchronization`: Mapping of Minecraft server ranks to Discord roles.
-`messages`: Customizable messages for various plugin interactions.
-`commands_for_link`: Commands executed on the Minecraft server upon successful Discord synchronization.
+`database`: Configuration for MySQL database connections.<br/>
+`bot_token`, channel_id, guild_id: Required for setting up the Discord bot communication.<br/>
+`verified_role_id`: The ID of the role assigned on Discord after successful account synchronization.<br/>
+`GroupRoleSynchronization`: Mapping of Minecraft server ranks to Discord roles.<br/>
+`messages`: Customizable messages for various plugin interactions.<br/>
+`commands_for_link`: Commands executed on the Minecraft server upon successful Discord synchronization.<br/>
 
 ## Commands
 `/discord`: Generates a unique code for account synchronization.
